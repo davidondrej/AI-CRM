@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     })
 
     console.log('\u2705 StreamText created, returning response')
-    return result.toAIStreamResponse()
+    return result.toUIMessageStreamResponse()
   } catch (error) {
     console.error('Chat API error:', error)
     return new Response('Internal Server Error', { status: 500 })
