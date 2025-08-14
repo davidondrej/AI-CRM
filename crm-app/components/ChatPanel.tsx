@@ -26,7 +26,7 @@ export default function ChatPanel({ onDataUpdate }: { onDataUpdate: () => void }
     e.preventDefault()
     console.log('🚀 Send button clicked, input value:', input)
     if (input.trim() && sendMessage) {
-      sendMessage({ text: input })
+      sendMessage(input)
       setInput('')
     }
     console.log('📤 SendMessage called')
@@ -66,7 +66,7 @@ export default function ChatPanel({ onDataUpdate }: { onDataUpdate: () => void }
                     : 'bg-white border text-gray-800'
                 }`}
               >
-                {message.content}
+                {message.parts?.filter(part => part.type === 'text').map(part => part.text).join('')}
               </div>
             </div>
           ))

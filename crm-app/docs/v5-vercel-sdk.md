@@ -14,6 +14,65 @@ import { convertToModelMessages } from 'ai'
 const modelMessages = convertToModelMessages(messages)
 ```
 
+## UIMessage Parts Array Structure
+
+### Content Property Deprecated
+In v5, **UIMessage.content is replaced with UIMessage.parts array**. The `content` property is legacy and maintained only for backward compatibility.
+
+**V4 Format (Deprecated):**
+```javascript
+const message = {
+  id: '1',
+  role: 'user',
+  content: 'Hello world'  // String content
+}
+```
+
+**V5 Format (Current):**
+```javascript
+const message = {
+  id: '1', 
+  role: 'user',
+  parts: [                // Array of message parts
+    { type: 'text', text: 'Hello world' }
+  ]
+}
+```
+
+### Frontend Rendering Pattern
+**Correct v5 rendering approach:**
+```javascript
+{messages.map(message => (
+  <div key={message.id}>
+    {message.parts?.filter(part => part.type === 'text')
+                   .map(part => part.text)
+                   .join('')}
+  </div>
+))}
+```
+
+### Text Extraction Helper
+Since there's no built-in helper, extract text manually:
+```javascript
+const getMessageText = (message) => {
+  return message.parts
+    ?.filter(part => part.type === 'text')
+    .map(part => part.text)
+    .join('') || '';
+};
+```
+
+### Multiple Part Types
+Parts array supports various types:
+- `text` - Text content
+- `tool-calls` - Function calls
+- `reasoning` - AI reasoning steps
+- `sources` - Referenced sources
+- `files` - File attachments
+
+### Streaming Behavior
+During streaming, parts may contain incomplete text that updates incrementally.
+
 ## Tool System Overhaul
 
 ### Parameter/Result Renaming[3][4]
@@ -155,9 +214,11 @@ Use compatibility wrapper during transition:
 ## Common Errors & Solutions
 
 1. **"Must be ModelMessage[]"** → Use `convertToModelMessages()`[1]
-2. **Tool calls not executing** → Check maxSteps/stopWhen consistency[5]
-3. **Silent tool failures** → Verify configuration matches between client/server
-4. **Stream format issues** → Update to new stream part types
+2. **"tools.0.custom.input_schema.type: Field required"** → Change `parameters` to `inputSchema`[13]
+3. **"message.content is undefined"** → Use `message.parts` array instead (see UIMessage Parts section)
+4. **Tool calls not executing** → Check maxSteps/stopWhen consistency[5]
+5. **Silent tool failures** → Verify configuration matches between client/server
+6. **Stream format issues** → Update to new stream part types
 
 ## Production Readiness[9][8]
 
@@ -168,6 +229,24 @@ Use compatibility wrapper during transition:
 - **Test extensively** with production-like scenarios
 
 The migration is substantial but enables better TypeScript support, tool streaming, and provider caching capabilities.[12]
+
+## Tool Schema Error Fix[13]
+
+**"tools.0.custom.input_schema.type: Field required"** occurs when Anthropic API receives tool schemas missing the mandatory `type: "object"` field. This happens in v5 when using old `parameters` format:
+
+```javascript
+// ❌ v4 format (causes Anthropic error)
+{
+  parameters: z.object({ input: z.string() })
+}
+
+// ✅ v5 format (generates correct schema) 
+{
+  inputSchema: z.object({ input: z.string() })
+}
+```
+
+The `inputSchema` format ensures Zod generates the required JSON schema structure that Anthropic expects.
 
 [1] https://github.com/vercel/ai/issues/6947
 [2] https://upstash.com/blog/ai-sdk-chat-history
@@ -181,7 +260,7 @@ The migration is substantial but enables better TypeScript support, tool streami
 [10] https://github.com/vercel/ai/issues/7993
 [11] https://jhakim.com/blog/ai-sdk-v5-migration
 [12] https://www.braingrid.ai/blog/migrating-to-ai-sdk-v5
-[13] https://voltagent.dev/blog/vercel-ai-sdk/
+[13] https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use
 [14] https://github.com/vercel/ai/issues/5318
 [15] https://github.com/MCPJam/inspector/issues/369
 [16] https://dev.to/yigit-konur/vercel-ai-sdk-v5-internals-part-7-decoupling-your-backend-the-chattransport-abstraction-1a83

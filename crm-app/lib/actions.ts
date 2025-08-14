@@ -13,7 +13,7 @@ import {
 export const crmTools = {
   getContacts: {
     description: 'Get all contacts from the CRM',
-    parameters: z.object({}),
+    inputSchema: z.object({}),
     execute: async () => {
       const contacts = await getContacts()
       return {
@@ -25,7 +25,7 @@ export const crmTools = {
 
   createContact: {
     description: 'Create a new contact',
-    parameters: z.object({
+    inputSchema: z.object({
       name: z.string().describe('Contact name'),
       email: z.string().email().describe('Contact email'),
       phone: z.string().optional().describe('Contact phone number'),
@@ -43,7 +43,7 @@ export const crmTools = {
 
   getLeads: {
     description: 'Get all leads from the CRM',
-    parameters: z.object({
+    inputSchema: z.object({
       status: z.enum(['new', 'qualified', 'contacted', 'converted', 'lost']).optional()
         .describe('Filter leads by status')
     }),
@@ -62,7 +62,7 @@ export const crmTools = {
 
   createLead: {
     description: 'Create a new lead',
-    parameters: z.object({
+    inputSchema: z.object({
       name: z.string().describe('Lead name'),
       email: z.string().email().describe('Lead email'),
       phone: z.string().optional().describe('Lead phone number'),
@@ -83,7 +83,7 @@ export const crmTools = {
 
   updateLead: {
     description: 'Update an existing lead',
-    parameters: z.object({
+    inputSchema: z.object({
       id: z.string().describe('Lead ID'),
       status: z.enum(['new', 'qualified', 'contacted', 'converted', 'lost']).optional(),
       value: z.number().optional(),
@@ -101,7 +101,7 @@ export const crmTools = {
 
   getTasks: {
     description: 'Get all tasks from the CRM',
-    parameters: z.object({
+    inputSchema: z.object({
       status: z.enum(['todo', 'in_progress', 'completed']).optional()
         .describe('Filter tasks by status')
     }),
@@ -120,7 +120,7 @@ export const crmTools = {
 
   createTask: {
     description: 'Create a new task',
-    parameters: z.object({
+    inputSchema: z.object({
       title: z.string().describe('Task title'),
       description: z.string().optional().describe('Task description'),
       status: z.enum(['todo', 'in_progress', 'completed']).default('todo'),
@@ -140,7 +140,7 @@ export const crmTools = {
 
   updateTask: {
     description: 'Update an existing task',
-    parameters: z.object({
+    inputSchema: z.object({
       id: z.string().describe('Task ID'),
       status: z.enum(['todo', 'in_progress', 'completed']).optional(),
       priority: z.enum(['low', 'medium', 'high']).optional(),
