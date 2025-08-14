@@ -1,4 +1,4 @@
-import { streamText } from 'ai'
+import { streamText, convertToModelMessages } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { modelName, systemPrompt } from '@/lib/ai'
 import { crmTools } from '@/lib/actions'
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: anthropic(modelName),
       system: systemPrompt,
-      messages,
+      messages: convertToModelMessages(messages),
       tools: crmTools,
       maxSteps: 3
     })
