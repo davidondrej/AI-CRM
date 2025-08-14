@@ -73,6 +73,22 @@ Parts array supports various types:
 ### Streaming Behavior
 During streaming, parts may contain incomplete text that updates incrementally.
 
+### sendMessage API Change
+In v5, `sendMessage` requires a UIMessage object with `parts` array, not plain strings:
+
+```javascript
+// ❌ v4 - Plain string
+sendMessage("Hello!")
+
+// ✅ v5 - UIMessage object with parts
+sendMessage({ 
+  role: "user", 
+  parts: [{ type: "text", text: "Hello!" }] 
+})
+```
+
+Additional options like `body`, `headers`, or `data` can be passed for custom metadata.
+
 ## Tool System Overhaul
 
 ### Parameter/Result Renaming[3][4]

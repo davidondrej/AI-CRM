@@ -26,7 +26,10 @@ export default function ChatPanel({ onDataUpdate }: { onDataUpdate: () => void }
     e.preventDefault()
     console.log('🚀 Send button clicked, input value:', input)
     if (input.trim() && sendMessage) {
-      sendMessage(input)
+      sendMessage({ 
+        role: 'user', 
+        parts: [{ type: 'text', text: input }] 
+      })
       setInput('')
     }
     console.log('📤 SendMessage called')
